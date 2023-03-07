@@ -30,9 +30,7 @@ impl Reaction {
             id,
             name,
             substrate: vec![],
-            product: vec![],
-        }
-    }
+            product: vec![], } }
 
     pub fn add_substrate(&mut self, id: u32) {
         self.substrate.push(id);
@@ -40,6 +38,18 @@ impl Reaction {
 
     pub fn add_product(&mut self, id: u32) {
         self.product.push(id);
+    }
+
+    pub fn get_substrate(&self) -> &Vec<u32> {
+        &self.substrate
+    }
+
+    pub fn get_product(&self) -> &Vec<u32> {
+        &self.product
+    }
+
+    pub fn get_id(&self) -> u32 {
+        self.id
     }
 }
 
@@ -71,5 +81,17 @@ impl Pathway {
 
     pub fn add_reaction(&mut self, reaction: Reaction) {
         self.reactions.push(reaction);
+    }
+
+    pub fn get_compounds_count(&self) -> usize {
+        self.compounds.len()
+    }
+
+    pub fn get_reactions_count(&self) -> usize {
+        self.reactions.len()
+    }
+
+    pub fn get_reactions(&self) -> &Vec<Reaction> {
+        &self.reactions
     }
 }
