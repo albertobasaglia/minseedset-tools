@@ -20,20 +20,6 @@ struct Args {
     filename: PathBuf,
 }
 
-fn compound_name_to_u32(name: &String) -> u32 {
-    name.strip_prefix("C")
-        .expect("Invalid compound name")
-        .parse()
-        .expect("Invalid compound name")
-}
-
-fn reaction_name_to_u32(name: &String) -> u32 {
-    name.strip_prefix("R")
-        .expect("Invalid compound name")
-        .parse()
-        .expect("Invalid compound name")
-}
-
 fn read_u32_from_optres(val: Option<&String>) -> u32 {
     val.expect("Parse error")
         .as_str()
@@ -59,7 +45,7 @@ fn parse_file(reader: BufReader<File>) -> Pathway {
 
     let mut compound_id = 0u32;
     for comp in comps_it {
-        let c = Compound::new(compound_id, compound_name_to_u32(comp));
+        let c = Compound::new(compound_id, comp.clone());
 
         info!("Added: {:?}", c);
         pathway.add_compound(c);
@@ -76,21 +62,19 @@ fn parse_file(reader: BufReader<File>) -> Pathway {
     while let Some(reac) = reacs_it.next() {
         let name = reac;
 
-        let mut reaction = Reaction::new(reaction_id, reaction_name_to_u32(name));
+        let mut reaction = Reaction::new(reaction_id, name.clone());
 
         let substrate_size: u32 = reacs_it.next().unwrap().parse().expect("Format error!");
         for _ in 0..substrate_size {
             let compound = reacs_it.next().unwrap();
-            let compound_name = compound_name_to_u32(compound);
-            let compound_id = pathway.get_compound_id(compound_name);
+            let compound_id = pathway.get_compound_id(compound);
             reaction.add_substrate(compound_id);
         }
 
         let product_size: u32 = reacs_it.next().unwrap().parse().expect("Format error!");
         for _ in 0..product_size {
             let compound = reacs_it.next().unwrap();
-            let compound_name = compound_name_to_u32(compound);
-            let compound_id = pathway.get_compound_id(compound_name);
+            let compound_id = pathway.get_compound_id(compound);
             reaction.add_product(compound_id);
         }
 
