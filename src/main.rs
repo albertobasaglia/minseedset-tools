@@ -216,7 +216,6 @@ fn build_model(pathway: Pathway) -> LpProblem {
                 right_vars.push(other_right);
             }
 
-            // how do I format left <= right + right_vars ???
             let mut right_expr: LpExpression = right.try_into().unwrap();
             for rv in right_vars {
                 right_expr = right_expr + rv;
