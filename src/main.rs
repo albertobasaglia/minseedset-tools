@@ -7,6 +7,7 @@ use std::{
 };
 
 use clap::Parser;
+use log::info;
 use lp_modeler::{
     dsl::{LpBinary, LpExpression, LpOperations, LpProblem},
     format::lp_format::LpFileFormat,
@@ -52,7 +53,7 @@ fn parse_file(reader: BufReader<File>) -> Pathway {
 
     let compounds_count: usize = read_u32_from_optres(it.next()).try_into().unwrap();
 
-    println!("File contains {} compounds", compounds_count);
+    info!("File contains {} compounds", compounds_count);
 
     let comps_it = it.clone().take(compounds_count);
 
@@ -60,7 +61,7 @@ fn parse_file(reader: BufReader<File>) -> Pathway {
     for comp in comps_it {
         let c = Compound::new(compound_id, compound_name_to_u32(comp));
 
-        println!("Added: {:?}", c);
+        info!("Added: {:?}", c);
         pathway.add_compound(c);
 
         compound_id += 1;
@@ -68,7 +69,7 @@ fn parse_file(reader: BufReader<File>) -> Pathway {
 
     let mut reacs_it = it.clone().skip(compounds_count);
     let reactions_count: usize = read_u32_from_optres(reacs_it.next()).try_into().unwrap();
-    println!("File contains {} reactions", reactions_count);
+    info!("File contains {} reactions", reactions_count);
 
     let mut reaction_id = 0;
 
@@ -95,7 +96,7 @@ fn parse_file(reader: BufReader<File>) -> Pathway {
 
         reaction_id += 1;
 
-        println!("Added: {:?}", reaction);
+        info!("Added: {:?}", reaction);
         pathway.add_reaction(reaction);
     }
     return pathway;
@@ -104,7 +105,7 @@ fn parse_file(reader: BufReader<File>) -> Pathway {
 const T: usize = 30;
 
 fn build_model(pathway: Pathway) -> LpProblem {
-    println!("Building model");
+    info!("Building model");
     let rs = pathway.get_reactions_count();
     let cs = pathway.get_compounds_count();
 
@@ -127,7 +128,6 @@ fn build_model(pathway: Pathway) -> LpProblem {
 
         for sub in reaction.get_substrate() {
             let sub_usize: usize = sub.to_owned() as usize;
-            // reac_requires_comp[sub_usize].push(reaction.get_id());
             reac_requires_comp[reaction.get_id() as usize].push(sub_usize as u32);
         }
     }
@@ -136,7 +136,7 @@ fn build_model(pathway: Pathway) -> LpProblem {
     let mut vars_d = Vec::<[LpBinary; T]>::new();
     let mut vars_s = Vec::<[LpBinary; T]>::new();
 
-    println!("Generating variables");
+    info!("Generating variables");
     // Create vars_x and vars_d
     for i in 0..cs {
         vars_x.push(LpBinary::new(format!("x{}", i).as_str()));
@@ -165,14 +165,14 @@ fn build_model(pathway: Pathway) -> LpProblem {
 
     let mut problem = LpProblem::new("MSS", lp_modeler::dsl::LpObjective::Minimize);
 
-    println!("Generating constraints");
+    info!("Generating constraints");
 
     // target function
     for var_x in &vars_x {
         problem += var_x;
     }
 
-    println!("0/4");
+    info!("0/4");
 
     // d_i0 = x_i
     for i in 0..cs {
@@ -181,7 +181,7 @@ fn build_model(pathway: Pathway) -> LpProblem {
         problem += left.equal(right);
     }
 
-    println!("1/4");
+    info!("1/4");
 
     // d_i(T-1) = 1
     for i in 0..cs {
@@ -189,7 +189,7 @@ fn build_model(pathway: Pathway) -> LpProblem {
         problem += left.equal(1);
     }
 
-    println!("2/4");
+    info!("2/4");
 
     // d_it >= s_jt
     for (reaction, compounds) in reac_requires_comp.iter().enumerate() {
@@ -202,7 +202,7 @@ fn build_model(pathway: Pathway) -> LpProblem {
         }
     }
 
-    println!("3/4");
+    info!("3/4");
 
     for i in 0..cs {
         for t in 1..T {
@@ -225,12 +225,13 @@ fn build_model(pathway: Pathway) -> LpProblem {
         }
     }
 
-    println!("4/4");
+    info!("4/4");
 
     problem
 }
 
 fn main() {
+    env_logger::init();
     let args = Args::parse();
 
     let file = File::open(args.filename).expect("Can't open file");
@@ -241,7 +242,7 @@ fn main() {
 
     let problem = build_model(pathway);
 
-    println!("Exporting model");
+    info!("Exporting model");
 
     problem.write_lp("out.lp").expect("Can't write model");
 }
