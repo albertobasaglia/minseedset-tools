@@ -1,13 +1,13 @@
 mod pathway;
 
-use std::{
-    fs::File,
+use std::{ fs::File,
     io::{BufRead, BufReader},
     path::PathBuf,
 };
 
 use clap::Parser;
 use log::info;
+use log::trace;
 use lp_modeler::{
     dsl::{LpBinary, LpExpression, LpOperations, LpProblem},
     format::lp_format::LpFileFormat,
@@ -47,7 +47,7 @@ fn parse_file(reader: BufReader<File>) -> Pathway {
     for comp in comps_it {
         let c = Compound::new(compound_id, comp.clone());
 
-        info!("Added: {:?}", c);
+        trace!("Added: {:?}", c);
         pathway.add_compound(c);
 
         compound_id += 1;
@@ -80,7 +80,7 @@ fn parse_file(reader: BufReader<File>) -> Pathway {
 
         reaction_id += 1;
 
-        info!("Added: {:?}", reaction);
+        trace!("Added: {:?}", reaction);
         pathway.add_reaction(reaction);
     }
     return pathway;
