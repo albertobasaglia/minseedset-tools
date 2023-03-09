@@ -1,6 +1,6 @@
+mod bigmmodel;
 mod pathway;
 mod timesetmodel;
-mod bigmmodel;
 
 use std::{
     fs::File,
@@ -8,19 +8,29 @@ use std::{
     path::PathBuf,
 };
 
-use timesetmodel::build_timeset_model;
 use bigmmodel::build_bigm_model;
+use timesetmodel::build_timeset_model;
 
 use clap::Parser;
+use clap::ValueEnum;
 use log::info;
 use log::trace;
 use lp_modeler::format::lp_format::LpFileFormat;
 
 use crate::pathway::{Compound, Pathway, Reaction};
 
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+enum ModelType {
+    Timeset,
+    Bigm,
+}
+
 #[derive(Parser)]
 struct Args {
+    mode: ModelType,
     filename: PathBuf,
+    #[arg(long, short, default_value_t = 10)]
+    time: u32,
 }
 
 fn read_u32_from_optres(val: Option<&String>) -> u32 {
@@ -99,8 +109,11 @@ fn main() {
 
     let pathway = parse_file(buffer_reader);
 
-    // let problem = build_timeset_model(pathway);
-    let problem = build_bigm_model(pathway);
+    let problem = match args.mode {
+        ModelType::Bigm => build_bigm_model(pathway, args.time as i32),
+        ModelType::Timeset => build_timeset_model(pathway),
+    };
+    // let cc = pathway.get_compounds_count() + pathway.get_reactions_count();
 
     info!("Exporting model");
 

@@ -1,11 +1,9 @@
 use crate::pathway::Pathway;
 use log::info;
-use lp_modeler::dsl::{LpBinary, LpExpression, LpOperations, LpProblem, LpInteger};
+use lp_modeler::dsl::{LpBinary, LpExpression, LpInteger, LpOperations, LpProblem};
 
-const M: i32 = 15;
-
-pub fn build_bigm_model(pathway: Pathway) -> LpProblem {
-    info!("Building model");
+pub fn build_bigm_model(pathway: Pathway, m: i32) -> LpProblem {
+    info!("Building Big-M model with M = {}", m);
     let rs = pathway.get_reactions_count();
     let cs = pathway.get_compounds_count();
 
@@ -97,7 +95,7 @@ pub fn build_bigm_model(pathway: Pathway) -> LpProblem {
             let nuj = &vars_nu[reaction];
             let xi = &vars_x[compound.to_owned() as usize];
 
-            problem += (tmi + 1).le(trj + M * nuj + M * xi);
+            problem += (tmi + 1).le(trj + m * nuj + m * xi);
         }
     }
 
@@ -109,18 +107,18 @@ pub fn build_bigm_model(pathway: Pathway) -> LpProblem {
             let tmi = &vars_tm[compound];
             let nuj = &vars_nu[reaction.to_owned() as usize];
 
-            problem += (trj).le(tmi + M * nuj);
+            problem += (trj).le(tmi + m * nuj);
         }
     }
 
     for i in 0..cs {
         let tm = &vars_tm[i];
-        problem += tm.le(M);
+        problem += tm.le(m);
     }
 
     for j in 0..rs {
         let tr = &vars_tr[j];
-        problem += tr.le(M);
+        problem += tr.le(m);
     }
 
     problem

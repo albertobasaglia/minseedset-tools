@@ -2,10 +2,10 @@ use crate::pathway::Pathway;
 use log::info;
 use lp_modeler::dsl::{LpBinary, LpExpression, LpOperations, LpProblem};
 
-const T: usize = 30;
+const T: usize = 20;
 
 pub fn build_timeset_model(pathway: Pathway) -> LpProblem {
-    info!("Building model");
+    info!("Building TimeSet model with T = {}", T);
     let rs = pathway.get_reactions_count();
     let cs = pathway.get_compounds_count();
 
