@@ -2,10 +2,8 @@ use crate::pathway::Pathway;
 use log::info;
 use lp_modeler::dsl::{LpBinary, LpExpression, LpOperations, LpProblem};
 
-const T: usize = 20;
-
-pub fn build_timeset_model(pathway: Pathway) -> LpProblem {
-    info!("Building TimeSet model with T = {}", T);
+pub fn build_timeset_model(pathway: Pathway, maxt: usize) -> LpProblem {
+    info!("Building TimeSet model with T = {}", maxt);
     let rs = pathway.get_reactions_count();
     let cs = pathway.get_compounds_count();
 
@@ -33,15 +31,15 @@ pub fn build_timeset_model(pathway: Pathway) -> LpProblem {
     }
 
     let mut vars_x = Vec::<LpBinary>::new();
-    let mut vars_d = Vec::<[LpBinary; T]>::new();
-    let mut vars_s = Vec::<[LpBinary; T]>::new();
+    let mut vars_d = Vec::<Vec<LpBinary>>::new();
+    let mut vars_s = Vec::<Vec<LpBinary>>::new();
 
     info!("Generating variables");
     // Create vars_x and vars_d
     for i in 0..cs {
         vars_x.push(LpBinary::new(format!("x{}", i).as_str()));
 
-        let entry: [LpBinary; T] = (0..T)
+        let entry: Vec<LpBinary> = (0..maxt)
             .into_iter()
             .map(|x| LpBinary::new(format!("d{}_{}", i, x).as_str()))
             .collect::<Vec<LpBinary>>()
@@ -53,7 +51,7 @@ pub fn build_timeset_model(pathway: Pathway) -> LpProblem {
 
     // Create vars_s
     for j in 0..rs {
-        let entry: [LpBinary; T] = (0..T)
+        let entry: Vec<LpBinary> = (0..maxt)
             .into_iter()
             .map(|x| LpBinary::new(format!("s{}_{}", j, x).as_str()))
             .collect::<Vec<LpBinary>>()
@@ -85,7 +83,7 @@ pub fn build_timeset_model(pathway: Pathway) -> LpProblem {
 
     // d_i(T-1) = 1
     for i in 0..cs {
-        let left = &vars_d[i][T - 1];
+        let left = &vars_d[i][maxt - 1];
         problem += left.equal(1);
     }
 
@@ -94,7 +92,7 @@ pub fn build_timeset_model(pathway: Pathway) -> LpProblem {
     // d_it >= s_jt
     for (reaction, compounds) in reac_requires_comp.iter().enumerate() {
         for compound in compounds {
-            for t in 0..T {
+            for t in 0..maxt {
                 let left = &vars_d[compound.to_owned() as usize][t];
                 let right = &vars_s[reaction][t];
                 problem += left.ge(right);
@@ -105,7 +103,7 @@ pub fn build_timeset_model(pathway: Pathway) -> LpProblem {
     info!("3/4");
 
     for i in 0..cs {
-        for t in 1..T {
+        for t in 1..maxt {
             let left = &vars_d[i][t];
             let right = &vars_d[i][t - 1];
 

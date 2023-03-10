@@ -36,7 +36,6 @@ pub fn build_bigm_model(pathway: Pathway, m: i32) -> LpProblem {
 
     // j index
     let mut vars_u = Vec::<LpBinary>::new();
-    let mut vars_nu = Vec::<LpBinary>::new();
     let mut vars_tr = Vec::<LpInteger>::new();
 
     info!("Generating variables");
@@ -49,11 +48,8 @@ pub fn build_bigm_model(pathway: Pathway, m: i32) -> LpProblem {
 
     for j in 0..rs {
         let u = LpBinary::new(format!("u{}", j).as_str());
-        let nu = LpBinary::new(format!("nu{}", j).as_str());
-        problem += nu.equal(1 - &u);
 
         vars_u.push(u);
-        vars_nu.push(nu);
         vars_tr.push(LpInteger::new(format!("tr{}", j).as_str()));
     }
 
@@ -86,18 +82,22 @@ pub fn build_bigm_model(pathway: Pathway, m: i32) -> LpProblem {
         problem += expr.ge(1);
     }
 
+    info!("1/4");
+
     // tc rij = 1
 
     for (reaction, compounds) in reac_requires_comp.iter().enumerate() {
         for compound in compounds {
             let tmi = &vars_tm[compound.to_owned() as usize];
             let trj = &vars_tr[reaction];
-            let nuj = &vars_nu[reaction];
+            let uj = &vars_u[reaction];
             let xi = &vars_x[compound.to_owned() as usize];
 
-            problem += (tmi + 1).le(trj + m * nuj + m * xi);
+            problem += (tmi + 1).le(trj + m - m * uj + m * xi);
         }
     }
+
+    info!("2/4");
 
     // tc pij = 1
 
@@ -105,11 +105,13 @@ pub fn build_bigm_model(pathway: Pathway, m: i32) -> LpProblem {
         for reaction in reactions {
             let trj = &vars_tr[reaction.to_owned() as usize];
             let tmi = &vars_tm[compound];
-            let nuj = &vars_nu[reaction.to_owned() as usize];
+            let uj = &vars_u[reaction.to_owned() as usize];
 
-            problem += (trj).le(tmi + m * nuj);
+            problem += (trj).le(tmi + m - m * uj);
         }
     }
+
+    info!("3/4");
 
     for i in 0..cs {
         let tm = &vars_tm[i];
@@ -120,6 +122,8 @@ pub fn build_bigm_model(pathway: Pathway, m: i32) -> LpProblem {
         let tr = &vars_tr[j];
         problem += tr.le(m);
     }
+
+    info!("4/4");
 
     problem
 }
