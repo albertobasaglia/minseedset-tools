@@ -111,7 +111,7 @@ fn main() {
 
     let problem = match args.mode {
         ModelType::Bigm => build_bigm_model(pathway, args.time as i32),
-        ModelType::Timeset => build_timeset_model(pathway, args.time as usize),
+        ModelType::Timeset => build_timeset_model(pathway, args.time as usize + 2),
     };
     // let cc = pathway.get_compounds_count() + pathway.get_reactions_count();
 
