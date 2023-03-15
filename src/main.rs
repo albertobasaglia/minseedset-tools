@@ -1,4 +1,5 @@
 mod bigmmodel;
+mod newmodel;
 mod pathway;
 mod timesetmodel;
 
@@ -9,6 +10,7 @@ use std::{
 };
 
 use bigmmodel::build_bigm_model;
+use newmodel::build_newmodel_model;
 use timesetmodel::build_timeset_model;
 
 use clap::Parser;
@@ -23,6 +25,7 @@ use crate::pathway::{Compound, Pathway, Reaction};
 enum ModelType {
     Timeset,
     Bigm,
+    New,
 }
 
 #[derive(Parser)]
@@ -112,6 +115,7 @@ fn main() {
     let problem = match args.mode {
         ModelType::Bigm => build_bigm_model(pathway, args.time as i32),
         ModelType::Timeset => build_timeset_model(pathway, args.time as usize + 2),
+        ModelType::New => build_newmodel_model(pathway, args.time as i32),
     };
     // let cc = pathway.get_compounds_count() + pathway.get_reactions_count();
 

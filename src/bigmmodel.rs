@@ -24,6 +24,10 @@ pub fn build_bigm_model(pathway: Pathway, m: i32) -> LpProblem {
             comp_produced_by_reac[prod_usize].push(reaction.get_id());
         }
 
+        if reaction.get_product().len() > 1 {
+            panic!("This model doesn't allow multiple reactions products");
+        }
+
         for sub in reaction.get_substrate() {
             let sub_usize: usize = sub.to_owned() as usize;
             reac_requires_comp[reaction.get_id() as usize].push(sub_usize as u32);
