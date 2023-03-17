@@ -34,6 +34,7 @@ struct Args {
     filename: PathBuf,
     #[arg(long, short, default_value_t = 10)]
     time: u32,
+    model_name: PathBuf,
 }
 
 fn read_u32_from_optres(val: Option<&String>) -> u32 {
@@ -121,5 +122,8 @@ fn main() {
 
     info!("Exporting model");
 
-    problem.write_lp("out.lp").expect("Can't write model");
+    let binding = args.model_name.into_os_string().into_string().unwrap();
+    let model_path = binding.as_str();
+
+    problem.write_lp(model_path).expect("Can't write model");
 }
