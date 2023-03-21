@@ -25,7 +25,7 @@ pub fn build_bigm_model(pathway: Pathway, m: i32) -> LpProblem {
         }
 
         if reaction.get_product().len() > 1 {
-            panic!("This model doesn't allow multiple reactions products");
+            panic!("This model doesn't allow multiple-product reactions");
         }
 
         for sub in reaction.get_substrate() {

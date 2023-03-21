@@ -77,6 +77,13 @@ impl Pathway {
             .unwrap()
     }
 
+    pub fn get_compound_option(&self, name: &String) -> Option<u32> {
+        self.compounds
+            .iter()
+            .find(|x| &x.name == name)
+            .map(|x| x.id)
+    }
+
     pub fn add_compound(&mut self, compound: Compound) {
         self.compounds.push(compound);
     }

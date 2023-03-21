@@ -8,6 +8,8 @@ pub fn build_newmodel_model(pathway: Pathway, m: i32) -> LpProblem {
     let rs = pathway.get_reactions_count();
     let cs = pathway.get_compounds_count();
 
+    info!("Reactions: {}, Compounds: {}", rs, cs);
+
     let mut comp_produced_by_reac = Vec::<Vec<u32>>::with_capacity(cs);
     let mut reac_requires_comp = Vec::<Vec<u32>>::with_capacity(rs);
 
