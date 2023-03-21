@@ -62,19 +62,25 @@ fn main() {
     env_logger::init();
     let args = Args::parse();
 
-    let pathway = match args.input_type {
+    let mut pathway = match args.input_type {
         InputType::Readable => parse_readable(args.filename),
         InputType::PDDL => parse_pddl(args.filename),
     };
 
-    // TODO implement split and join_duplicates
+    if args.split {
+        pathway.split_multiple_product();
+        info!("Splitting multiple product reactions");
+    }
+
+    // TODO implement join_duplicates
+
+    // println!("{:?}", pathway);
 
     let problem = match args.mode {
         ModelType::Bigm => build_bigm_model(pathway, args.time as i32),
         ModelType::Timeset => build_timeset_model(pathway, args.time as usize + 2),
         ModelType::New => build_newmodel_model(pathway, args.time as i32),
     };
-    // let cc = pathway.get_compounds_count() + pathway.get_reactions_count();
 
     info!("Exporting model");
 

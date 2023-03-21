@@ -17,7 +17,7 @@ pub struct Reaction {
     // Internal ID
     id: u32,
     // ID used in the file
-    _name: String,
+    name: String,
     // Contains the IDs
     substrate: Vec<u32>,
     // Contains the IDs
@@ -28,7 +28,7 @@ impl Reaction {
     pub fn new(id: u32, name: String) -> Self {
         Reaction {
             id,
-            _name: name,
+            name,
             substrate: vec![],
             product: vec![],
         }
@@ -52,6 +52,10 @@ impl Reaction {
 
     pub fn get_id(&self) -> u32 {
         self.id
+    }
+
+    pub fn get_name(&self) -> &String {
+        &self.name
     }
 }
 
@@ -102,5 +106,25 @@ impl Pathway {
 
     pub fn get_reactions(&self) -> &Vec<Reaction> {
         &self.reactions
+    }
+
+    pub fn split_multiple_product(&mut self) {
+        let mut reaction_counter = 0;
+        let mut new_reactions: Vec<Reaction> = vec![];
+        for reaction in &self.reactions {
+            for product in reaction.get_product() {
+                let mut new_reac = Reaction::new(
+                    reaction_counter,
+                    format!("{}_{}", reaction.get_name(), product.to_string()),
+                );
+                reaction_counter += 1;
+                for substrate in reaction.get_substrate() {
+                    new_reac.add_substrate(substrate.clone());
+                }
+                new_reac.add_product(product.clone());
+                new_reactions.push(new_reac);
+            }
+        }
+        self.reactions = new_reactions;
     }
 }
