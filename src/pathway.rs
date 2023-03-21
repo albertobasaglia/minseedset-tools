@@ -108,10 +108,14 @@ impl Pathway {
         &self.reactions
     }
 
-    pub fn split_multiple_product(&mut self) {
+    pub fn split_multiple_product(&mut self) -> u32 {
         let mut reaction_counter = 0;
         let mut new_reactions: Vec<Reaction> = vec![];
+        let mut split_count = 0;
         for reaction in &self.reactions {
+            if reaction.get_product().len() > 1 {
+                split_count += 1;
+            }
             for product in reaction.get_product() {
                 let mut new_reac = Reaction::new(
                     reaction_counter,
@@ -126,5 +130,6 @@ impl Pathway {
             }
         }
         self.reactions = new_reactions;
+        split_count
     }
 }

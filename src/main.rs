@@ -11,11 +11,13 @@ use bigmmodel::build_bigm_model;
 use newmodel::build_newmodel_model;
 use parsepddl::parse_pddl;
 use parsereadable::parse_readable;
+use pathway::Pathway;
 use timesetmodel::build_timeset_model;
 
 use clap::Parser;
 use clap::ValueEnum;
 use log::info;
+use log::trace;
 use lp_modeler::format::lp_format::LpFileFormat;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
@@ -58,6 +60,13 @@ struct Args {
     join_duplicates: bool,
 }
 
+fn print_count(pathway: &Pathway) {
+    let cc = pathway.get_compounds_count();
+    let rc = pathway.get_reactions_count();
+
+    info!("Compound count: {}, Reaction count: {}", cc, rc);
+}
+
 fn main() {
     env_logger::init();
     let args = Args::parse();
@@ -67,14 +76,18 @@ fn main() {
         InputType::PDDL => parse_pddl(args.filename),
     };
 
+    print_count(&pathway);
+
     if args.split {
-        pathway.split_multiple_product();
         info!("Splitting multiple product reactions");
+        let count = pathway.split_multiple_product();
+        info!("Split {} reactions", count);
+        print_count(&pathway);
     }
 
     // TODO implement join_duplicates
 
-    // println!("{:?}", pathway);
+    trace!("{:?}", pathway);
 
     let problem = match args.mode {
         ModelType::Bigm => build_bigm_model(pathway, args.time as i32),

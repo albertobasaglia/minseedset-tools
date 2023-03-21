@@ -90,7 +90,7 @@ pub fn parse_pddl(input: PathBuf) -> Pathway {
     }
 
     for prod in &current_product {
-        reac.add_substrate(prod.clone());
+        reac.add_product(prod.clone());
     }
 
     pathway.add_reaction(reac);
