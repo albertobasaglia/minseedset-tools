@@ -57,6 +57,36 @@ impl Reaction {
     pub fn get_name(&self) -> &String {
         &self.name
     }
+
+    pub fn has_same_substrate(&self, other: &Self) -> bool {
+        // This has terrible performances. Maybe use a set to save the compounds
+        for s in &self.substrate {
+            if !other.substrate.contains(s) {
+                return false;
+            }
+        }
+        for s in &other.substrate {
+            if !self.substrate.contains(s) {
+                return false;
+            }
+        }
+        true
+    }
+
+    pub fn has_same_product(&self, other: &Self) -> bool {
+        // This has terrible performances. Maybe use a set to save the compounds
+        for p in &self.product {
+            if !other.product.contains(p) {
+                return false;
+            }
+        }
+        for p in &other.product {
+            if !self.product.contains(p) {
+                return false;
+            }
+        }
+        true
+    }
 }
 
 #[derive(Debug)]
@@ -108,6 +138,7 @@ impl Pathway {
         &self.reactions
     }
 
+    /// This changes the IDs of the reactions!
     pub fn split_multiple_product(&mut self) -> u32 {
         let mut reaction_counter = 0;
         let mut new_reactions: Vec<Reaction> = vec![];
@@ -131,5 +162,32 @@ impl Pathway {
         }
         self.reactions = new_reactions;
         split_count
+    }
+
+    /// This changes the IDs of the reactions!
+    pub fn join_duplicates(&mut self) -> u32 {
+        let mut new_reactions: Vec<Reaction> = vec![];
+        let mut dup_count = 0;
+
+        let mut id_counter = 0;
+
+        while let Some(mut reaction) = self.reactions.pop() {
+            let mut dup = false;
+            for ins in &new_reactions {
+                if reaction.has_same_product(&ins) && reaction.has_same_substrate(&ins) {
+                    dup = true;
+                    dup_count += 1;
+                    break;
+                }
+            }
+            if !dup {
+                reaction.id = id_counter;
+                new_reactions.push(reaction);
+                id_counter += 1;
+            }
+        }
+
+        self.reactions = new_reactions;
+        dup_count
     }
 }

@@ -85,7 +85,12 @@ fn main() {
         print_count(&pathway);
     }
 
-    // TODO implement join_duplicates
+    if args.join_duplicates {
+        info!("Removing duplicate reactions");
+        let count = pathway.join_duplicates();
+        info!("Removed {} reactions", count);
+        print_count(&pathway);
+    }
 
     trace!("{:?}", pathway);
 
