@@ -10,7 +10,10 @@ pub fn build_newmodel_model(pathway: Pathway, m: i32) -> LpProblem {
 
     info!("Reactions: {}, Compounds: {}", rs, cs);
 
+    // index i contains reactions that produce i
     let mut comp_produced_by_reac = Vec::<Vec<u32>>::with_capacity(cs);
+
+    // index j contains compounds required for j
     let mut reac_requires_comp = Vec::<Vec<u32>>::with_capacity(rs);
 
     for _ in 0..cs {
@@ -50,17 +53,20 @@ pub fn build_newmodel_model(pathway: Pathway, m: i32) -> LpProblem {
     }
 
     for (compound, cr) in comp_produced_by_reac.iter().enumerate() {
+        // "cr" = reactions that produce "compound"
         for reac in cr {
+            // "reac" produces "compound"
             trace!("Compound {} produced by reaction {}", compound, reac);
             let u_bj = LpBinary::new(format!("u{}_{}", compound, reac).as_str());
 
-            // Generate the constraint
-
             for req in &reac_requires_comp[reac.to_owned() as usize] {
+                // for every compound required by "reac"
+
                 trace!("\tthat requires compound {}", req);
                 let t_a = &vars_t[req.to_owned() as usize];
                 let t_b = &vars_t[compound];
                 let x_a = &vars_x[req.to_owned() as usize];
+
                 // t_a + 1 <= t_b + M (x_a) + M (1 - u_bj)
                 problem += t_a.le(-1 + t_b + m * x_a + m * (1 - &u_bj));
             }
