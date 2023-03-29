@@ -58,32 +58,40 @@ impl Reaction {
         &self.name
     }
 
-    pub fn has_same_substrate(&self, other: &Self) -> bool {
-        // This has terrible performances. Maybe use a set to save the compounds
+    pub fn is_substrate_subset(&self, other: &Self) -> bool {
         for s in &self.substrate {
             if !other.substrate.contains(s) {
-                return false;
-            }
-        }
-        for s in &other.substrate {
-            if !self.substrate.contains(s) {
                 return false;
             }
         }
         true
     }
 
-    pub fn has_same_product(&self, other: &Self) -> bool {
-        // This has terrible performances. Maybe use a set to save the compounds
+    pub fn is_product_subset(&self, other: &Self) -> bool {
         for p in &self.product {
             if !other.product.contains(p) {
                 return false;
             }
         }
-        for p in &other.product {
-            if !self.product.contains(p) {
-                return false;
-            }
+        true
+    }
+
+    pub fn has_same_substrate(&self, other: &Self) -> bool {
+        if !self.is_substrate_subset(other) {
+            return false;
+        }
+        if !other.is_substrate_subset(self) {
+            return false;
+        }
+        true
+    }
+
+    pub fn has_same_product(&self, other: &Self) -> bool {
+        if !self.is_product_subset(other) {
+            return false;
+        }
+        if !other.is_product_subset(self) {
+            return false;
         }
         true
     }
@@ -138,7 +146,7 @@ impl Pathway {
         &self.reactions
     }
 
-    /// This changes the IDs of the reactions!
+    /// WARNING: This changes the IDs of the reactions!
     pub fn split_multiple_product(&mut self) -> u32 {
         let mut reaction_counter = 0;
         let mut new_reactions: Vec<Reaction> = vec![];
@@ -164,7 +172,7 @@ impl Pathway {
         split_count
     }
 
-    /// This changes the IDs of the reactions!
+    /// WARNING: This changes the IDs of the reactions!
     pub fn join_duplicates(&mut self) -> u32 {
         let mut new_reactions: Vec<Reaction> = vec![];
         let mut dup_count = 0;
@@ -175,6 +183,33 @@ impl Pathway {
             let mut dup = false;
             for ins in &new_reactions {
                 if reaction.has_same_product(&ins) && reaction.has_same_substrate(&ins) {
+                    dup = true;
+                    dup_count += 1;
+                    break;
+                }
+            }
+            if !dup {
+                reaction.id = id_counter;
+                new_reactions.push(reaction);
+                id_counter += 1;
+            }
+        }
+
+        self.reactions = new_reactions;
+        dup_count
+    }
+
+    /// WARNING: This changes the IDs of the reactions!
+    pub fn join_dominated(&mut self) -> u32 {
+        let mut new_reactions: Vec<Reaction> = vec![];
+        let mut dup_count = 0;
+
+        let mut id_counter = 0;
+
+        while let Some(mut reaction) = self.reactions.pop() {
+            let mut dup = false;
+            for ins in &self.reactions {
+                if reaction.has_same_product(&ins) && reaction.is_substrate_subset(&ins) {
                     dup = true;
                     dup_count += 1;
                     break;

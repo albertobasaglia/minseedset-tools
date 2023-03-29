@@ -55,7 +55,7 @@ struct Args {
     #[arg(short, long)]
     split: bool,
 
-    /// Join duplicate reactions
+    /// Join duplicate and dominated reactions
     #[arg(short, long)]
     join_duplicates: bool,
 }
@@ -88,6 +88,11 @@ fn main() {
     if args.join_duplicates {
         info!("Removing duplicate reactions");
         let count = pathway.join_duplicates();
+        info!("Removed {} reactions", count);
+        print_count(&pathway);
+
+        info!("Removing dominated reactions");
+        let count = pathway.join_dominated();
         info!("Removed {} reactions", count);
         print_count(&pathway);
     }
