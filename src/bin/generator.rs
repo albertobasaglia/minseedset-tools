@@ -1,22 +1,14 @@
-mod bigmmodel;
-mod newmodel;
-mod parsepddl;
-mod parsereadable;
-mod pathway;
-mod timesetmodel;
-
 use std::cmp::min;
 use std::path::PathBuf;
 
-use bigmmodel::build_bigm_model;
-use newmodel::build_newmodel_model;
-use parsepddl::parse_pddl;
-use parsereadable::parse_readable;
-use pathway::Pathway;
-use timesetmodel::build_timeset_model;
-
 use clap::Parser;
 use clap::ValueEnum;
+use fast_model::models::bigmmodel::build_bigm_model;
+use fast_model::models::newmodel::build_newmodel_model;
+use fast_model::models::timesetmodel::build_timeset_model;
+use fast_model::parsers::parsepddl::parse_pddl;
+use fast_model::parsers::parsereadable::parse_readable;
+use fast_model::pw::pathway::Pathway;
 use log::info;
 use log::trace;
 use lp_modeler::format::lp_format::LpFileFormat;

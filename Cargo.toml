@@ -10,3 +10,11 @@ clap = { version = "4.1.8", features = ["derive"] }
 env_logger = "0.10.0"
 log = "0.4.17"
 lp-modeler = "0.5.0"
+
+[[bin]]
+name = "fast_model"
+path = "src/bin/generator.rs"
+
+[[bin]]
+name = "sol_checker"
+path = "src/bin/sol_checker.rs"

@@ -1,7 +1,8 @@
-use crate::pathway::Pathway;
 use log::info;
 use log::trace;
 use lp_modeler::dsl::{LpBinary, LpExpression, LpInteger, LpOperations, LpProblem};
+
+use crate::pw::pathway::Pathway;
 
 pub fn build_newmodel_model(pathway: Pathway, m: i32) -> LpProblem {
     info!("Building NEW model with M = {}", m);

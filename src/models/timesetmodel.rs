@@ -1,4 +1,4 @@
-use crate::pathway::Pathway;
+use crate::pw::pathway::Pathway;
 use log::info;
 use lp_modeler::dsl::{LpBinary, LpExpression, LpOperations, LpProblem};
 

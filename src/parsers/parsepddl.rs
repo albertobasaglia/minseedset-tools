@@ -1,8 +1,10 @@
 use std::{fs::File, io::Read, path::PathBuf};
 
-use crate::pathway::{Compound, Pathway, Reaction};
-
 use log::trace;
+
+use crate::pw::compound::Compound;
+use crate::pw::pathway::Pathway;
+use crate::pw::reaction::Reaction;
 
 pub fn parse_pddl(input: PathBuf) -> Pathway {
     let mut pathway = Pathway::new();

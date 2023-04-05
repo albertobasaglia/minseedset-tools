@@ -7,9 +7,9 @@ use std::{
 use log::info;
 use log::trace;
 
-use crate::pathway::Compound;
-use crate::pathway::Pathway;
-use crate::pathway::Reaction;
+use crate::pw::compound::Compound;
+use crate::pw::pathway::Pathway;
+use crate::pw::reaction::Reaction;
 
 fn read_u32_from_optres(val: Option<&String>) -> u32 {
     val.expect("Parse error")
