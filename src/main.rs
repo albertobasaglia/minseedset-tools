@@ -5,6 +5,7 @@ mod parsereadable;
 mod pathway;
 mod timesetmodel;
 
+use std::cmp::min;
 use std::path::PathBuf;
 
 use bigmmodel::build_bigm_model;
@@ -43,7 +44,7 @@ struct Args {
 
     /// T/M of the model
     #[arg(long, short, default_value_t = 10)]
-    time: u32,
+    time: i32,
 
     /// Name of the output file
     model_name: PathBuf,
@@ -99,10 +100,17 @@ fn main() {
 
     trace!("{:?}", pathway);
 
+    let mut time_m = args.time;
+
+    if args.time == -1 {
+        info!("Using min{{#read, #comp}} as time instants");
+        time_m = min(pathway.get_reactions_count(), pathway.get_compounds_count()) as i32;
+    }
+
     let problem = match args.mode {
-        ModelType::Bigm => build_bigm_model(pathway, args.time as i32),
-        ModelType::Timeset => build_timeset_model(pathway, args.time as usize + 2),
-        ModelType::New => build_newmodel_model(pathway, args.time as i32),
+        ModelType::Bigm => build_bigm_model(pathway, time_m),
+        ModelType::Timeset => build_timeset_model(pathway, time_m as usize + 2),
+        ModelType::New => build_newmodel_model(pathway, time_m),
     };
 
     info!("Exporting model");
