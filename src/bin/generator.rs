@@ -1,4 +1,6 @@
 use std::cmp::min;
+use std::fs::File;
+use std::io::BufWriter;
 use std::path::PathBuf;
 
 use clap::Parser;
@@ -51,6 +53,10 @@ struct Args {
     /// Join duplicate and dominated reactions
     #[arg(short, long)]
     join_duplicates: bool,
+
+    /// Export the generated model for further operations
+    #[arg(short, long)]
+    export: bool,
 }
 
 fn print_count(pathway: &Pathway) {
@@ -100,9 +106,9 @@ fn main() {
     }
 
     let problem = match args.mode {
-        ModelType::Bigm => build_bigm_model(pathway, time_m),
-        ModelType::Timeset => build_timeset_model(pathway, time_m as usize + 2),
-        ModelType::New => build_newmodel_model(pathway, time_m),
+        ModelType::Bigm => build_bigm_model(&pathway, time_m),
+        ModelType::Timeset => build_timeset_model(&pathway, time_m as usize + 2),
+        ModelType::New => build_newmodel_model(&pathway, time_m),
     };
 
     info!("Exporting model");
@@ -111,4 +117,9 @@ fn main() {
     let model_path = binding.as_str();
 
     problem.write_lp(model_path).expect("Can't write model");
+    if args.export {
+        let model_out = File::create("model.json").expect("Can't open file");
+        let writer = BufWriter::new(model_out);
+        serde_json::to_writer_pretty(writer, &pathway);
+    }
 }

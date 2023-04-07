@@ -1,4 +1,5 @@
-#[derive(Debug)]
+use serde::{Deserialize, Serialize};
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Reaction {
     // Internal ID
     pub id: u32,

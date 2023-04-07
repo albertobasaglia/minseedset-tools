@@ -3,7 +3,7 @@ use lp_modeler::dsl::{LpBinary, LpExpression, LpInteger, LpOperations, LpProblem
 
 use crate::pw::pathway::Pathway;
 
-pub fn build_bigm_model(pathway: Pathway, m: i32) -> LpProblem {
+pub fn build_bigm_model(pathway: &Pathway, m: i32) -> LpProblem {
     info!("Building Big-M model with M = {}", m);
     let rs = pathway.get_reactions_count();
     let cs = pathway.get_compounds_count();

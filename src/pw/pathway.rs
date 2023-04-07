@@ -1,7 +1,8 @@
+use serde::{Deserialize, Serialize};
 use crate::pw::compound::Compound;
 use crate::pw::reaction::Reaction;
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Pathway {
     compounds: Vec<Compound>,
     reactions: Vec<Reaction>,
