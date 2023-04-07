@@ -109,8 +109,8 @@ fn main() {
     }
 
     let mut iteration = 0u32;
+    let mut to_add = Vec::<u32>::new();
     loop {
-        let mut has_effect = false;
         for reac in pw.get_reactions() {
             let mut all_substrate = true;
             for s in reac.get_substrate() {
@@ -121,16 +121,21 @@ fn main() {
             }
             if all_substrate {
                 for p in reac.get_product() {
-                    if in_set.insert(p.clone()) {
-                        has_effect = true;
+                    if !in_set.contains(p) {
+                        to_add.push(p.clone());
                     }
                 }
             }
         }
-        if !has_effect || in_set.len() == pw.get_compounds_count() {
+
+        iteration += 1;
+
+        if to_add.len() == 0 || in_set.len() == pw.get_compounds_count() {
             break;
         }
-        iteration += 1;
+
+        in_set.extend(to_add.iter());
+        to_add.clear();
     }
     print!("Completed {} iterations, ", iteration);
     if in_set.len() == pw.get_compounds_count() {
