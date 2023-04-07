@@ -1,12 +1,8 @@
 use fast_model::pw::pathway::Pathway;
 use log::info;
-use log::trace;
-use serde::Deserializer;
-use serde::Serializer;
 use serde::{Deserialize, Serialize};
 use serde_xml_rs::from_reader;
 use std::collections::HashSet;
-use std::io::BufRead;
 use std::{fs::File, io::BufReader};
 
 #[derive(Debug, Deserialize, Serialize)]

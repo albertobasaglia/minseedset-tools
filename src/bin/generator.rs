@@ -120,6 +120,6 @@ fn main() {
     if args.export {
         let model_out = File::create("model.json").expect("Can't open file");
         let writer = BufWriter::new(model_out);
-        serde_json::to_writer_pretty(writer, &pathway);
+        serde_json::to_writer_pretty(writer, &pathway).expect("Model writing failed");
     }
 }
