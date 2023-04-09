@@ -1,6 +1,7 @@
-use serde::{Deserialize, Serialize};
 use crate::pw::compound::Compound;
 use crate::pw::reaction::Reaction;
+use log::debug;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Pathway {
@@ -114,7 +115,8 @@ impl Pathway {
         while let Some(mut reaction) = self.reactions.pop() {
             let mut dup = false;
             for ins in &self.reactions {
-                if reaction.has_same_product(&ins) && reaction.is_substrate_subset(&ins) {
+                if reaction.has_same_substrate(&ins) && reaction.is_product_subset(&ins) {
+                    debug!("Removing {:?} ------ Dominated by {:?}", reaction, ins);
                     dup = true;
                     dup_count += 1;
                     break;
