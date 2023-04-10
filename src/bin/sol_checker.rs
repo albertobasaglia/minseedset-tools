@@ -1,8 +1,10 @@
+use clap::Parser;
 use fast_model::pw::pathway::Pathway;
 use log::info;
 use serde::{Deserialize, Serialize};
 use serde_xml_rs::from_reader;
 use std::collections::HashSet;
+use std::path::PathBuf;
 use std::{fs::File, io::BufReader};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -72,14 +74,25 @@ struct ObjectiveValue {
     value: f32,
 }
 
+#[derive(Parser)]
+struct Args {
+    /// Json model file
+    model: PathBuf,
+
+    /// CPLEX solution file
+    solution: PathBuf,
+}
+
 fn main() {
     env_logger::init();
+    let args = Args::parse();
 
-    let model_name = "model.json";
+    let model_name = args.model;
+    let solution_name = args.solution;
+
     let model_file = File::open(model_name).expect("Can't open model file");
     let model_reader = BufReader::new(model_file);
 
-    let solution_name = "sol.txt";
     let solution_file = File::open(solution_name).expect("Can't open solution file");
     let read_sol = BufReader::new(solution_file);
     let sol: Solution = from_reader(read_sol).expect("Can't read xml");
@@ -137,10 +150,11 @@ fn main() {
         in_set.extend(to_add.iter());
         to_add.clear();
     }
-    print!("Completed {} iterations, ", iteration);
+    info!("Completed {} iterations, ", iteration);
     if in_set.len() == pw.get_compounds_count() {
-        println!("set is reachable.");
+        info!("set is reachable.");
     } else {
-        println!("set is unreachable, completed full iteration with no effect.");
+        info!("set is unreachable, completed full iteration with no effect.");
     }
+    print!("{}", iteration);
 }

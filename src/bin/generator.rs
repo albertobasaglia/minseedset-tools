@@ -55,8 +55,8 @@ struct Args {
     join_duplicates: bool,
 
     /// Export the generated model for further operations
-    #[arg(short, long)]
-    export: bool,
+    #[arg(long)]
+    json_model: Option<PathBuf>,
 }
 
 fn print_count(pathway: &Pathway) {
@@ -117,8 +117,10 @@ fn main() {
     let model_path = binding.as_str();
 
     problem.write_lp(model_path).expect("Can't write model");
-    if args.export {
-        let model_out = File::create("model.json").expect("Can't open file");
+
+    if let Some(json_path) = args.json_model {
+        info!("Writing json model to {}", json_path.display());
+        let model_out = File::create(json_path).expect("Can't open file");
         let writer = BufWriter::new(model_out);
         serde_json::to_writer_pretty(writer, &pathway).expect("Model writing failed");
     }
