@@ -5,12 +5,12 @@ use std::path::PathBuf;
 
 use clap::Parser;
 use clap::ValueEnum;
-use fast_model::models::bigmmodel::build_bigm_model;
-use fast_model::models::newmodel::build_newmodel_model;
-use fast_model::models::timesetmodel::build_timeset_model;
-use fast_model::parsers::parsepddl::parse_pddl;
-use fast_model::parsers::parsereadable::parse_readable;
-use fast_model::pw::pathway::Pathway;
+use msstools::models::bigmmodel::build_bigm_model;
+use msstools::models::newmodel::build_newmodel_model;
+use msstools::models::timesetmodel::build_timeset_model;
+use msstools::parsers::parsepddl::parse_pddl;
+use msstools::parsers::parsereadable::parse_readable;
+use msstools::pw::pathway::Pathway;
 use log::info;
 use log::trace;
 use lp_modeler::format::lp_format::LpFileFormat;

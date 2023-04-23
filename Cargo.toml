@@ -1,6 +1,6 @@
 [package]
-name = "fast_model"
-version = "0.3.0"
+name = "msstools"
+version = "0.4.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -15,9 +15,9 @@ serde-xml-rs = "0.6.0"
 serde_json = "1.0.95"
 
 [[bin]]
-name = "fast_model"
+name = "mss-generator"
 path = "src/bin/generator.rs"
 
 [[bin]]
-name = "sol_checker"
+name = "mss-checker"
 path = "src/bin/sol_checker.rs"
