@@ -5,15 +5,16 @@ use std::path::PathBuf;
 
 use clap::Parser;
 use clap::ValueEnum;
+use log::info;
+use log::trace;
+use lp_modeler::format::lp_format::LpFileFormat;
 use msstools::models::bigmmodel::build_bigm_model;
 use msstools::models::newmodel::build_newmodel_model;
 use msstools::models::timesetmodel::build_timeset_model;
 use msstools::parsers::parsepddl::parse_pddl;
 use msstools::parsers::parsereadable::parse_readable;
 use msstools::pw::pathway::Pathway;
-use log::info;
-use log::trace;
-use lp_modeler::format::lp_format::LpFileFormat;
+use serde_json::to_writer_pretty;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 enum ModelType {
@@ -122,6 +123,6 @@ fn main() {
         info!("Writing json model to {}", json_path.display());
         let model_out = File::create(json_path).expect("Can't open file");
         let writer = BufWriter::new(model_out);
-        serde_json::to_writer_pretty(writer, &pathway).expect("Model writing failed");
+        to_writer_pretty(writer, &pathway).expect("Model writing failed");
     }
 }
