@@ -13,7 +13,7 @@ use msstools::models::newmodel::build_newmodel_model;
 use msstools::models::timesetmodel::build_timeset_model;
 use msstools::parsers::parsepddl::parse_pddl;
 use msstools::parsers::parsereadable::parse_readable;
-use msstools::pw::pathway::Pathway;
+use msstools::pw::Pathway;
 use serde_json::to_writer_pretty;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]

@@ -1,7 +1,8 @@
-use crate::pw::pathway::Pathway;
+use crate::pw::Pathway;
 use log::info;
 use lp_modeler::dsl::{LpBinary, LpExpression, LpOperations, LpProblem};
 
+/// Genera il modello basato sul timeset
 pub fn build_timeset_model(pathway: &Pathway, maxt: usize) -> LpProblem {
     info!("Building TimeSet model with T = {}", maxt);
     let rs = pathway.get_reactions_count();

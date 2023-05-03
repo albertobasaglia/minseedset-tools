@@ -3,9 +3,14 @@ use crate::pw::reaction::Reaction;
 use log::debug;
 use serde::{Deserialize, Serialize};
 
+/// Struct per rappresentare l'insieme di reazioni e di molecole all'interno
+/// di un organismo
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Pathway {
+    /// Insieme delle molecole
     compounds: Vec<Compound>,
+
+    /// Insieme delle reazioni
     reactions: Vec<Reaction>,
 }
 

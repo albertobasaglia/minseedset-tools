@@ -7,9 +7,9 @@ use std::{
 use log::info;
 use log::trace;
 
-use crate::pw::compound::Compound;
-use crate::pw::pathway::Pathway;
-use crate::pw::reaction::Reaction;
+use crate::pw::Compound;
+use crate::pw::Pathway;
+use crate::pw::Reaction;
 
 fn read_u32_from_optres(val: Option<&String>) -> u32 {
     val.expect("Parse error")
@@ -18,6 +18,7 @@ fn read_u32_from_optres(val: Option<&String>) -> u32 {
         .expect("Parse error")
 }
 
+/// Legge un pathway da un file di tipo .read
 pub fn parse_readable(input: PathBuf) -> Pathway {
     let file = File::open(input).expect("Can't open file");
 

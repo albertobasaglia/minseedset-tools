@@ -1,5 +1,5 @@
 use clap::Parser;
-use msstools::pw::pathway::Pathway;
+use msstools::pw::Pathway;
 use log::info;
 use serde::{Deserialize, Serialize};
 use serde_xml_rs::from_reader;

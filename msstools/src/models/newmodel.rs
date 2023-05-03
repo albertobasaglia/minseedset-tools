@@ -2,8 +2,9 @@ use log::info;
 use log::trace;
 use lp_modeler::dsl::{LpBinary, LpExpression, LpInteger, LpOperations, LpProblem};
 
-use crate::pw::pathway::Pathway;
+use crate::pw::Pathway;
 
+/// Genera la seconda versione del modello big-M
 pub fn build_newmodel_model(pathway: &Pathway, m: i32) -> LpProblem {
     info!("Building NEW model with M = {}", m);
     let rs = pathway.get_reactions_count();

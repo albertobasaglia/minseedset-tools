@@ -1,10 +1,12 @@
 use serde::{Deserialize, Serialize};
 
+/// Struct per rappresentare un elemento in un organismo
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Compound {
-    // Internal ID
+    /// ID interno
     pub id: u32,
-    // ID used in the file
+
+    /// ID letto dal file
     pub name: String,
 }
 

@@ -1,13 +1,18 @@
 use serde::{Deserialize, Serialize};
+
+/// Struct per rappresentare una reazione all'interno di un organismo
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Reaction {
-    // Internal ID
+    /// ID usato all'interno dell'organismo
     pub id: u32,
-    // ID used in the file
+
+    /// ID letto dal file
     pub name: String,
-    // Contains the IDs
+
+    /// Insieme dei reagenti
     pub substrate: Vec<u32>,
-    // Contains the IDs
+
+    /// Insieme dei prodotti
     pub product: Vec<u32>,
 }
 

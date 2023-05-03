@@ -1,8 +1,11 @@
 use log::info;
 use lp_modeler::dsl::{LpBinary, LpExpression, LpInteger, LpOperations, LpProblem};
 
-use crate::pw::pathway::Pathway;
+use crate::pw::Pathway;
 
+/// Genera la prima versione del modello big-M (non documentato nella tesi)
+///
+/// il pathway non deve contenere reazioni con piu' di un prodotto
 pub fn build_bigm_model(pathway: &Pathway, m: i32) -> LpProblem {
     info!("Building Big-M model with M = {}", m);
     let rs = pathway.get_reactions_count();

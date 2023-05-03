@@ -2,10 +2,11 @@ use std::{fs::File, io::Read, path::PathBuf};
 
 use log::trace;
 
-use crate::pw::compound::Compound;
-use crate::pw::pathway::Pathway;
-use crate::pw::reaction::Reaction;
+use crate::pw::Compound;
+use crate::pw::Pathway;
+use crate::pw::Reaction;
 
+/// Legge un pathway da un file .pddl
 pub fn parse_pddl(input: PathBuf) -> Pathway {
     let mut pathway = Pathway::new();
 
