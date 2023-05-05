@@ -120,7 +120,8 @@ impl Pathway {
         while let Some(mut reaction) = self.reactions.pop() {
             let mut dup = false;
             for ins in &self.reactions {
-                if reaction.has_same_substrate(&ins) && reaction.is_product_subset(&ins) {
+                if reaction.has_same_substrate(&ins) && reaction.is_product_subset_or_superset(&ins)
+                {
                     debug!("Removing {:?} ------ Dominated by {:?}", reaction, ins);
                     dup = true;
                     dup_count += 1;

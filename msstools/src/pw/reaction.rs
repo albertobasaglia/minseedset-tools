@@ -68,6 +68,10 @@ impl Reaction {
         true
     }
 
+    pub fn is_product_subset_or_superset(&self, other: &Self) -> bool {
+        self.is_product_subset(other) || other.is_product_subset(self)
+    }
+
     pub fn has_same_substrate(&self, other: &Self) -> bool {
         if !self.is_substrate_subset(other) {
             return false;
