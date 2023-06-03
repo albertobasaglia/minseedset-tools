@@ -73,11 +73,14 @@ pub fn build_timeset_model(pathway: &Pathway, maxt: usize) -> LpProblem {
 
     info!("0/4");
 
+    let mut nnz = 0u32;
+
     // d_i0 = x_i
     for i in 0..cs {
         let left = &vars_d[i][0];
         let right = &vars_x[i];
         problem += left.equal(right);
+        nnz += 2;
     }
 
     info!("1/4");
@@ -86,6 +89,7 @@ pub fn build_timeset_model(pathway: &Pathway, maxt: usize) -> LpProblem {
     for i in 0..cs {
         let left = &vars_d[i][maxt - 1];
         problem += left.equal(1);
+        nnz += 1;
     }
 
     info!("2/4");
@@ -97,6 +101,7 @@ pub fn build_timeset_model(pathway: &Pathway, maxt: usize) -> LpProblem {
                 let left = &vars_d[compound.to_owned() as usize][t];
                 let right = &vars_s[reaction][t];
                 problem += left.ge(right);
+                nnz += 2;
             }
         }
     }
@@ -113,6 +118,7 @@ pub fn build_timeset_model(pathway: &Pathway, maxt: usize) -> LpProblem {
             for reaction in &comp_produced_by_reac[i] {
                 let other_right = &vars_s[reaction.to_owned() as usize][t - 1];
                 right_vars.push(other_right);
+                nnz += 1;
             }
 
             let mut right_expr: LpExpression = right.try_into().unwrap();
@@ -121,10 +127,13 @@ pub fn build_timeset_model(pathway: &Pathway, maxt: usize) -> LpProblem {
             }
 
             problem += left.le(right_expr);
+            nnz+=2;
         }
     }
 
     info!("4/4");
+
+    info!("nnz: {}", nnz);
 
     problem
 }

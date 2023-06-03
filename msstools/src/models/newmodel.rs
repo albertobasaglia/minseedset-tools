@@ -54,6 +54,8 @@ pub fn build_newmodel_model(pathway: &Pathway, m: i32) -> LpProblem {
         vars_u.push(vec![]);
     }
 
+    let mut nnz = 0u32;
+
     for (compound, cr) in comp_produced_by_reac.iter().enumerate() {
         // "cr" = reactions that produce "compound"
         for reac in cr {
@@ -71,10 +73,12 @@ pub fn build_newmodel_model(pathway: &Pathway, m: i32) -> LpProblem {
 
                 // t_a + 1 <= t_b + M (x_a) + M (1 - u_bj)
                 problem += t_a.le(-1 + t_b + m * x_a + m * (1 - &u_bj));
+                nnz += 4;
             }
             vars_u[compound].push(u_bj);
         }
     }
+
 
     info!("Generating constraints");
 
@@ -86,16 +90,22 @@ pub fn build_newmodel_model(pathway: &Pathway, m: i32) -> LpProblem {
     // ti <= M
     for ti in &vars_t {
         problem += ti.le(m);
+
+        nnz += 1;
     }
 
     for i in 0..cs {
         let xi = &vars_x[i];
         let mut left_side: LpExpression = xi.try_into().unwrap();
         for a in &vars_u[i] {
+            nnz += 1;
             left_side += a;
         }
         problem += left_side.ge(1);
+        nnz += 1;
     }
+
+    info!("nnz: {}", nnz);
 
     problem
 }

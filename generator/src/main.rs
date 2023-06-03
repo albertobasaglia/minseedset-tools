@@ -112,6 +112,11 @@ fn main() {
         ModelType::New => build_newmodel_model(&pathway, time_m),
     };
 
+    let ncols = problem.variables().len();
+    let nrows = problem.constraints.len();
+
+    info!("ncols: {}, nrows: {}", ncols, nrows);
+
     info!("Exporting model");
 
     let binding = args.model_name.into_os_string().into_string().unwrap();
