@@ -1,6 +1,6 @@
 use clap::Parser;
-use msstools::pw::Pathway;
 use log::info;
+use msstools::pw::Pathway;
 use serde::{Deserialize, Serialize};
 use serde_xml_rs::from_reader;
 use std::collections::HashSet;
@@ -121,6 +121,8 @@ fn main() {
         );
     }
 
+    info!("MSS contains {} compounds", in_set.len());
+
     let mut iteration = 0u32;
     let mut to_add = Vec::<u32>::new();
     loop {
@@ -151,10 +153,13 @@ fn main() {
         to_add.clear();
     }
     info!("Completed {} iterations, ", iteration);
+    print!("{}", iteration);
+
     if in_set.len() == pw.get_compounds_count() {
         info!("set is reachable.");
+        std::process::exit(0);
     } else {
         info!("set is unreachable, completed full iteration with no effect.");
+        std::process::exit(-1);
     }
-    print!("{}", iteration);
 }
