@@ -4,3 +4,4 @@ members = [
         "checker",
         "generator"
 ]
+resolver = "2"
