@@ -78,6 +78,13 @@ fn main() {
 
     print_count(&pathway);
 
+    if let Some(json_path) = args.json_model {
+        info!("Writing json model to {}", json_path.display());
+        let model_out = File::create(json_path).expect("Can't open file");
+        let writer = BufWriter::new(model_out);
+        to_writer_pretty(writer, &pathway).expect("Model writing failed");
+    }
+
     if args.split {
         info!("Splitting multiple product reactions");
         let count = pathway.split_multiple_product();
@@ -119,10 +126,4 @@ fn main() {
 
     problem.write_lp(model_path).expect("Can't write model");
 
-    if let Some(json_path) = args.json_model {
-        info!("Writing json model to {}", json_path.display());
-        let model_out = File::create(json_path).expect("Can't open file");
-        let writer = BufWriter::new(model_out);
-        to_writer_pretty(writer, &pathway).expect("Model writing failed");
-    }
 }
