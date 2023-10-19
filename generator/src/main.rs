@@ -47,13 +47,12 @@ struct Args {
     /// Input file type
     input_type: InputType,
 
-    /// Split multiple-product reactions
-    #[arg(short, long)]
-    split: bool,
-
-    /// Join duplicate and dominated reactions
-    #[arg(short, long)]
-    join_duplicates: bool,
+    /// String representing the preprocessing to execute
+    ///
+    /// s: split,
+    /// d: remove duplicates,
+    /// D: remove dominated
+    preprocessing_string: Option<String>,
 
     /// Export the generated model for further operations
     #[arg(long)]
@@ -78,30 +77,61 @@ fn main() {
 
     print_count(&pathway);
 
-    if let Some(json_path) = args.json_model {
-        info!("Writing json model to {}", json_path.display());
-        let model_out = File::create(json_path).expect("Can't open file");
+    if let Some(json_path) = &args.json_model {
+        let ext_path = json_path.with_extension("pre.json");
+        info!("Writing pre-pp json model to {}", ext_path.display());
+        let model_out = File::create(ext_path).expect("Can't open file");
         let writer = BufWriter::new(model_out);
         to_writer_pretty(writer, &pathway).expect("Model writing failed");
     }
 
-    if args.split {
-        info!("Splitting multiple product reactions");
-        let count = pathway.split_multiple_product();
-        info!("Split {} reactions", count);
-        print_count(&pathway);
+    if let Some(pps) = args.preprocessing_string {
+        let mut total_count = 1;
+        let mut cycle_count = 1;
+        while total_count > 0 {
+            total_count = 0;
+            info!("==== Preprocessing cycle #{} ====", cycle_count);
+            cycle_count += 1;
+            for pre in pps.chars() {
+                match pre {
+                    'd' => {
+                        let count = pathway.join_duplicates();
+                        info!("Joining duplicates removed {} reactions", count);
+                        total_count += count;
+                        // print_count(&pathway);
+                    }
+                    'P' => {
+                        let count = pathway.join_dominated_product();
+                        info!("Joining p-dominated removed {} reactions", count);
+                        total_count += count;
+                        // print_count(&pathway);
+                    }
+                    'S' => {
+                        let count = pathway.join_dominated_substrate();
+                        info!("Joining s-dominated removed {} reactions", count);
+                        total_count += count;
+                        // print_count(&pathway);
+                    }
+                    'm' => {
+                        let count = pathway.merge_reactions();
+                        info!("Merged {} reactions", count);
+                        total_count += count;
+                        // print_count(&pathway);
+                    }
+                    _ => {
+                        info!("unknown preprocessing {}", pre);
+                    }
+                }
+            }
+        }
     }
 
-    if args.join_duplicates {
-        info!("Removing duplicate reactions");
-        let count = pathway.join_duplicates();
-        info!("Removed {} reactions", count);
-        print_count(&pathway);
-
-        info!("Removing dominated reactions");
-        let count = pathway.join_dominated();
-        info!("Removed {} reactions", count);
-        print_count(&pathway);
+    if let Some(json_path2) = args.json_model {
+        let ext_path = json_path2.with_extension("post.json");
+        info!("Writing post-pp json model to {}", ext_path.display());
+        let model_out = File::create(ext_path).expect("Can't open file");
+        let writer = BufWriter::new(model_out);
+        to_writer_pretty(writer, &pathway).expect("Model writing failed");
     }
 
     trace!("{:?}", pathway);
@@ -125,5 +155,4 @@ fn main() {
     let model_path = binding.as_str();
 
     problem.write_lp(model_path).expect("Can't write model");
-
 }

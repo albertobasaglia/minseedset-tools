@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Struct per rappresentare una reazione all'interno di un organismo
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Reaction {
     /// ID usato all'interno dell'organismo
     pub id: u32,
@@ -51,6 +51,9 @@ impl Reaction {
     }
 
     pub fn is_substrate_subset(&self, other: &Self) -> bool {
+        if self.has_same_substrate(other) {
+            return false;
+        }
         for s in &self.substrate {
             if !other.substrate.contains(s) {
                 return false;
@@ -60,6 +63,9 @@ impl Reaction {
     }
 
     pub fn is_product_subset(&self, other: &Self) -> bool {
+        if self.has_same_product(other) {
+            return false;
+        }
         for p in &self.product {
             if !other.product.contains(p) {
                 return false;
@@ -72,23 +78,23 @@ impl Reaction {
         self.is_product_subset(other) || other.is_product_subset(self)
     }
 
+    pub fn is_substrate_subset_or_superset(&self, other: &Self) -> bool {
+        self.is_substrate_subset(other) || other.is_substrate_subset(self)
+    }
+
     pub fn has_same_substrate(&self, other: &Self) -> bool {
-        if !self.is_substrate_subset(other) {
-            return false;
-        }
-        if !other.is_substrate_subset(self) {
-            return false;
-        }
-        true
+        let mut vec1 = self.substrate.to_vec();
+        let mut vec2 = other.substrate.to_vec();
+        vec1.sort();
+        vec2.sort();
+        return vec1 == vec2;
     }
 
     pub fn has_same_product(&self, other: &Self) -> bool {
-        if !self.is_product_subset(other) {
-            return false;
-        }
-        if !other.is_product_subset(self) {
-            return false;
-        }
-        true
+        let mut vec1 = self.product.to_vec();
+        let mut vec2 = other.product.to_vec();
+        vec1.sort();
+        vec2.sort();
+        return vec1 == vec2;
     }
 }

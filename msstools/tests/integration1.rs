@@ -59,7 +59,7 @@ fn test_dominated() {
 
     assert_eq!(pathway.get_reactions_count(), 2);
 
-    pathway.join_dominated();
+    pathway.join_dominated_product();
 
     assert_eq!(pathway.get_reactions_count(), 1);
 }
