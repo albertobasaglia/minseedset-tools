@@ -54,9 +54,13 @@ struct Args {
     /// D: remove dominated
     preprocessing_string: Option<String>,
 
-    /// Export the generated model for further operations
+    /// Export the pathway before the preprocessing to a file
     #[arg(long)]
-    json_model: Option<PathBuf>,
+    json_model_pre: Option<PathBuf>,
+
+    /// Export the pathway after the preprocessing to a file
+    #[arg(long)]
+    json_model_post: Option<PathBuf>,
 }
 
 fn print_count(pathway: &Pathway) {
@@ -77,10 +81,9 @@ fn main() {
 
     print_count(&pathway);
 
-    if let Some(json_path) = &args.json_model {
-        let ext_path = json_path.with_extension("pre.json");
-        info!("Writing pre-pp json model to {}", ext_path.display());
-        let model_out = File::create(ext_path).expect("Can't open file");
+    if let Some(json_path) = &args.json_model_pre {
+        info!("Writing pre-pp json model to {}", json_path.display());
+        let model_out = File::create(json_path).expect("Can't open file");
         let writer = BufWriter::new(model_out);
         to_writer_pretty(writer, &pathway).expect("Model writing failed");
     }
@@ -126,10 +129,9 @@ fn main() {
         }
     }
 
-    if let Some(json_path2) = args.json_model {
-        let ext_path = json_path2.with_extension("post.json");
-        info!("Writing post-pp json model to {}", ext_path.display());
-        let model_out = File::create(ext_path).expect("Can't open file");
+    if let Some(json_path2) = args.json_model_post {
+        info!("Writing post-pp json model to {}", json_path2.display());
+        let model_out = File::create(json_path2).expect("Can't open file");
         let writer = BufWriter::new(model_out);
         to_writer_pretty(writer, &pathway).expect("Model writing failed");
     }
