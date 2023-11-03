@@ -49,9 +49,10 @@ struct Args {
 
     /// String representing the preprocessing to execute
     ///
-    /// s: split,
-    /// d: remove duplicates,
-    /// D: remove dominated
+    /// m: merge,
+    /// P: remove product-dominated,
+    /// S: remove substrate-dominated,
+    /// d: remove duplicated
     preprocessing_string: Option<String>,
 
     /// Export the pathway before the preprocessing to a file
@@ -87,6 +88,8 @@ fn main() {
         let writer = BufWriter::new(model_out);
         to_writer_pretty(writer, &pathway).expect("Model writing failed");
     }
+
+    info!("Reactions before preprocessing: {}", &pathway.get_reactions_count());
 
     if let Some(pps) = args.preprocessing_string {
         let mut total_count = 1;
@@ -128,6 +131,8 @@ fn main() {
             }
         }
     }
+
+    info!("Reactions after preprocessing: {}", &pathway.get_reactions_count());
 
     if let Some(json_path2) = args.json_model_post {
         info!("Writing post-pp json model to {}", json_path2.display());
